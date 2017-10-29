@@ -5,9 +5,10 @@ $(document).ready(function() {
 		var spaceIndex = $("li").index($li);
 		if (game.validMove(spaceIndex)) {
 			game.placeMove(spaceIndex)
+			game.renderMove(spaceIndex);
+			console.log(game.currentPlayer());
 			if (game.boardWin()) {
-				var winner = game.findWinner();
-				console.log(winner)
+				console.log("winner", game.currentPlayer())
 			}
 			game.turnCount += 1
 		} else {
@@ -29,14 +30,32 @@ function Game() {
 	this.turnCount = 1
 }
 
+Game.prototype.currentPlayer = function() {
+	if (this.turnCount % 2 === 1) {
+		return this.player1
+	} else {
+		return this.player2
+	}
+}
+
+Game.prototype.currentPlayerColor = function() {
+	if (this.currentPlayer() === "X") {
+		return "red"
+	} else {
+		return "blue"
+	}
+}
+
 Game.prototype.placeMove = function(spaceIndex) {
 	var rowNum = Math.floor(spaceIndex / 3);
 	var columnNum = Math.floor(spaceIndex % 3);
-	if (this.turnCount % 2 === 1) {
-		this.board[rowNum][columnNum] = this.player1;
-	} else {
-		this.board[rowNum][columnNum] = this.player2;
-	}
+	this.board[rowNum][columnNum] = this.currentPlayer();
+}
+
+Game.prototype.renderMove = function(spaceIndex) {
+	console.log($(".turn"))
+	$($(".turn")[spaceIndex]).html(this.currentPlayer())
+	$($(".turn")[spaceIndex]).css("background-color", this.currentPlayerColor())
 }
 
 Game.prototype.validMove = function(spaceIndex) {
@@ -92,16 +111,6 @@ Game.prototype.diagonalWin = function() {
 
 Game.prototype.boardWin = function() {
 	return this.diagonalWin() || this.columnWin() || this.rowWin()
-}
-
-Game.prototype.findWinner = function() {
-	var winner;
-	if (this.turnCount % 2 === 1) {
-		winner = this.player1;
-	} else {
-		winner = this.player2;
-	}
-	return winner
 }
 
 // var rowWin = function(array) {
