@@ -3,11 +3,21 @@ $(document).ready(function() {
 	$("li").on("click", function(event) {
 		var $li = $(this)
 		var spaceIndex = $("li").index($li);
-		game.placeMove(spaceIndex)
-		game.turnCount += 1
+		if (game.validMove(spaceIndex)) {
+			game.placeMove(spaceIndex)
+			if (game.boardWin()) {
+				var winner = game.findWinner();
+				console.log(winner)
+			}
+			game.turnCount += 1
+		} else {
+			console.log("Derp")
+		}
 		console.log(game.board)
 		console.log("row", game.rowWin())
 		console.log("col", game.columnWin())
+		console.log("diag", game.diagonalWin())
+		console.log("board", game.boardWin())
 	});
 });
 
@@ -27,6 +37,15 @@ Game.prototype.placeMove = function(spaceIndex) {
 	} else {
 		this.board[rowNum][columnNum] = this.player2;
 	}
+}
+
+Game.prototype.validMove = function(spaceIndex) {
+	var rowNum = Math.floor(spaceIndex / 3);
+	var columnNum = Math.floor(spaceIndex % 3);
+	if (!this.board[rowNum][columnNum]) {
+		return true
+	}
+	return false
 }
 
 Game.prototype.rowWin = function() {
@@ -59,6 +78,30 @@ Game.prototype.columnWin = function() {
 	return transposedBoard.some(function(row) {
 		return that.checkRow(row) === true
 	});
+}
+
+Game.prototype.diagonalWin = function() {
+	if ((this.board[0][0] === this.board[1][1] && this.board[1][1] === this.board[2][2]) && this.board[0][0]) {
+		return true;
+	} else if ((this.board[0][2] === this.board[1][1] && this.board[1][1] === this.board[2][0]) && this.board[0][2]) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+Game.prototype.boardWin = function() {
+	return this.diagonalWin() || this.columnWin() || this.rowWin()
+}
+
+Game.prototype.findWinner = function() {
+	var winner;
+	if (this.turnCount % 2 === 1) {
+		winner = this.player1;
+	} else {
+		winner = this.player2;
+	}
+	return winner
 }
 
 // var rowWin = function(array) {
