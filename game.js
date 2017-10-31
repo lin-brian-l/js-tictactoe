@@ -5,7 +5,6 @@ function Game() {
 	this.turnCount = 1
 }
 
-
 Game.prototype.currentPlayer = function() {
 	if (this.turnCount % 2 === 1) {
 		return this.player1
@@ -55,37 +54,18 @@ Game.prototype.checkRow = function(row) {
 	})
 }
 
-Game.prototype.transposeBoard = function() {
-	var that = this
-	var transposedBoard = that.board[0].map(function(col, i) {
-    var newRow = that.board.map(function(row) {
-      return row[i]
-    })
-    return newRow
-  })
-  return transposedBoard;
-}
-
 Game.prototype.columnWin = function() {
 	var that = this;
-	var transposedBoard = that.transposeBoard();
+	var transposedBoard = transposeBoard(that.board);
 	return transposedBoard.some(function(row) {
 		return that.checkRow(row) === true
 	});
 }
 
-Game.prototype.checkUpLeft = function() {
-	return (this.board[0][0] === this.board[1][1] && this.board[1][1] === this.board[2][2]) && this.board[0][0]
-}
-
-Game.prototype.checkDownLeft = function() {
-	return (this.board[0][2] === this.board[1][1] && this.board[1][1] === this.board[2][0]) && this.board[0][2]
-}
-
 Game.prototype.diagonalWin = function() {
-	if (this.checkUpLeft()) {
+	if (checkUpLeft(this.board)) {
 		return true;
-	} else if (this.checkDownLeft()) {
+	} else if (checkDownLeft(this.board)) {
 		return true;
 	} else {
 		return false;
@@ -96,15 +76,12 @@ Game.prototype.boardWin = function() {
 	return this.diagonalWin() || this.columnWin() || this.rowWin();
 }
 
-Game.prototype.colorWin = function(direction, rowIndex) {
-	var spaceIndex;
+Game.prototype.colorWin = function(direction, index) {
 	var coordinates;
 	if (direction === "row") {
-		spaceIndex = rowIndex * 3;
-		coordinates = [spaceIndex, spaceIndex + 1, spaceIndex + 2];
+		coordinates = [index * 3, (index * 3) + 1, (index * 3) + 2];
 	} else if (direction === "column") {
-		spaceIndex = rowIndex;
-		coordinates = [spaceIndex, spaceIndex + 3, spaceIndex + 6];
+		coordinates = [index, index + 3, index + 6];
 	} else if (direction === "upleft") {
 		coordinates = [0, 4, 8];
 	} else if (direction === "downleft") {
@@ -118,7 +95,7 @@ Game.prototype.colorWin = function(direction, rowIndex) {
 Game.prototype.renderRowWin = function() {
 	var that = this
 	that.board.forEach(function(row) {
-		if ((row[0] === row[1] && row[0] === row[2]) && row[0]) {
+		if (checkRow(row)) {
 			that.colorWin("row", that.board.indexOf(row))
 		}
 	});
@@ -126,18 +103,18 @@ Game.prototype.renderRowWin = function() {
 
 Game.prototype.renderColumnWin = function() {
 	var that = this
-	var transposedBoard = this.transposeBoard();
+	var transposedBoard = transposeBoard(that.board);
 	transposedBoard.forEach(function(column) {
-		if ((column[0] === column[1] && column[0] === column[2]) && column[0]) {
+		if (checkRow(column)) {
 			that.colorWin("column", transposedBoard.indexOf(column))
  		}
 	});
 }
 
 Game.prototype.renderDiagonalWin = function() {
-	if (this.checkUpLeft()) {
+	if (checkUpLeft(this.board)) {
 		this.colorWin("upleft");
-	} else if (this.checkDownLeft()) {
+	} else if (checkDownLeft(this.board)) {
 		this.colorWin("downleft");
 	}
 }
@@ -166,4 +143,26 @@ Game.prototype.resetBoard = function() {
 	$(".turn").empty();
 	$(".turn").css("background-color", "white");
 	$(".replay").toggle();
+}
+
+var transposeBoard = function(array) {
+	var transposedBoard = array[0].map(function(col, i) {
+    var newRow = array.map(function(row) {
+      return row[i]
+    })
+    return newRow
+  })
+  return transposedBoard;
+}
+
+var checkUpLeft = function(array) {
+	return (array[0][0] === array[1][1] && array[1][1] === array[2][2]) && array[0][0]
+}
+
+var checkDownLeft = function(array) {
+	return (array[0][2] === array[1][1] && array[1][1] === array[2][0]) && array[0][2]
+}
+
+var checkRow = function(array) {
+	return ((array[0] === array[1] && array[0] === array[2]) && array[0])
 }
