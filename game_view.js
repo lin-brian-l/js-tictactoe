@@ -29,7 +29,7 @@ function renderRowWin(game) {
 }
 
 function renderColumnWin(game) {
-  var transposedBoard = transposeBoard(game.board);
+  var transposedBoard = game.transposeBoard();
   transposedBoard.forEach(function(column) {
     if (game.checkRow(column)) {
       spaceIndex = transposedBoard.indexOf(column)

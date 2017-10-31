@@ -4,7 +4,9 @@ $(document).ready(function() {
   $(".notice").html(message.message);
 
   $("li").on("click", function(event) {
+    console.log("hit")
     if (!game.over()) {
+      console.log("bash")
       var spaceIndex = parseInt($(this).attr("id"));
       var status = game.status(spaceIndex);
       if (status != "invalid") {

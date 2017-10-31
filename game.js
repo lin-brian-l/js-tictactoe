@@ -34,7 +34,7 @@ Game.prototype.rowWin = function() {
 
 Game.prototype.columnWin = function() {
 	var that = this;
-	var transposedBoard = transposeBoard(that.board);
+	var transposedBoard = that.transposeBoard();
 	return transposedBoard.some(function(row) {
 		return that.checkRow(row) === true
 	});
@@ -55,11 +55,16 @@ Game.prototype.boardWin = function() {
 }
 
 Game.prototype.remainingMoves = function() {
-	return $(".turn:empty").length === 0
+	var flatBoard = this.board.reduce(function(a, b) {
+		return a.concat(b);
+	});
+	return flatBoard.some(function(element) {
+		return element === null;
+	});
 }
 
 Game.prototype.over = function() {
-	return this.boardWin() || this.remainingMoves();
+	return this.boardWin() || !this.remainingMoves();
 }
 
 Game.prototype.reset = function() {
@@ -84,7 +89,7 @@ Game.prototype.status = function(spaceIndex) {
 		this.placeMove(spaceIndex)
 		if (this.boardWin()) {
 			return "win"
-		} else if (!this.remainingMoves()) {
+		} else if (this.remainingMoves()) {
 			return "continue"
 		} else {
 			return "draw"
@@ -94,9 +99,10 @@ Game.prototype.status = function(spaceIndex) {
 	}
 }
 
-transposeBoard = function(array) {
-	var transposedBoard = array[0].map(function(col, i) {
-    var newRow = array.map(function(row) {
+Game.prototype.transposeBoard = function() {
+	var that = this
+	var transposedBoard = that.board[0].map(function(col, i) {
+    var newRow = that.board.map(function(row) {
       return row[i]
     })
     return newRow
