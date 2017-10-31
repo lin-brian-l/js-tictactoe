@@ -22,10 +22,7 @@ Game.prototype.placeMove = function(spaceIndex) {
 Game.prototype.validMove = function(spaceIndex) {
 	var rowNum = Math.floor(spaceIndex / 3);
 	var columnNum = Math.floor(spaceIndex % 3);
-	if (!this.board[rowNum][columnNum]) {
-		return true
-	}
-	return false
+	return !this.board[rowNum][columnNum]
 }
 
 Game.prototype.rowWin = function() {
@@ -33,12 +30,6 @@ Game.prototype.rowWin = function() {
 	return that.board.some(function(row) {
 		return that.checkRow(row) === true
 	});
-}
-
-Game.prototype.checkRow = function(row) {
-	return !!row.reduce(function(a, b) {
-		return (a === b) ? a : NaN;
-	})
 }
 
 Game.prototype.columnWin = function() {
@@ -50,9 +41,9 @@ Game.prototype.columnWin = function() {
 }
 
 Game.prototype.diagonalWin = function() {
-	if (checkUpLeft(this.board)) {
+	if (this.checkUpLeft()) {
 		return true;
-	} else if (checkDownLeft(this.board)) {
+	} else if (this.checkDownLeft()) {
 		return true;
 	} else {
 		return false;
@@ -64,18 +55,46 @@ Game.prototype.boardWin = function() {
 }
 
 Game.prototype.remainingMoves = function() {
-	if ($(".turn:empty").length === 0) {
-		return false
-	}
-	return true
+	return $(".turn:empty").length === 0
 }
 
-Game.prototype.resetGame = function() {
+Game.prototype.over = function() {
+	return this.boardWin() || this.remainingMoves();
+}
+
+Game.prototype.reset = function() {
 	this.board = [[null, null, null], [null, null, null], [null, null, null]]
 	this.turnCount = 1
 }
 
-var transposeBoard = function(array) {
+Game.prototype.checkUpLeft = function() {
+	return (this.board[0][0] === this.board[1][1] && this.board[1][1] === this.board[2][2]) && !!this.board[0][0]
+}
+
+Game.prototype.checkDownLeft = function() {
+	return (this.board[0][2] === this.board[1][1] && this.board[1][1] === this.board[2][0]) && !!this.board[0][2]
+}
+
+Game.prototype.checkRow = function(array) {
+	return (array[0] === array[1] && array[0] === array[2]) && !!array[0]
+}
+
+Game.prototype.status = function(spaceIndex) {
+	if (this.validMove(spaceIndex)) {
+		this.placeMove(spaceIndex)
+		if (this.boardWin()) {
+			return "win"
+		} else if (!this.remainingMoves()) {
+			return "continue"
+		} else {
+			return "draw"
+		}
+	} else {
+		return "invalid"
+	}
+}
+
+transposeBoard = function(array) {
 	var transposedBoard = array[0].map(function(col, i) {
     var newRow = array.map(function(row) {
       return row[i]
@@ -83,16 +102,4 @@ var transposeBoard = function(array) {
     return newRow
   })
   return transposedBoard;
-}
-
-var checkUpLeft = function(array) {
-	return (array[0][0] === array[1][1] && array[1][1] === array[2][2]) && array[0][0]
-}
-
-var checkDownLeft = function(array) {
-	return (array[0][2] === array[1][1] && array[1][1] === array[2][0]) && array[0][2]
-}
-
-var checkRow = function(array) {
-	return ((array[0] === array[1] && array[0] === array[2]) && array[0])
 }
