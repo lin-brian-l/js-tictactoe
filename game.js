@@ -13,23 +13,10 @@ Game.prototype.currentPlayer = function() {
 	}
 }
 
-Game.prototype.currentPlayerColor = function() {
-	if (this.currentPlayer() === "X") {
-		return "red"
-	} else {
-		return "blue"
-	}
-}
-
 Game.prototype.placeMove = function(spaceIndex) {
 	var rowNum = Math.floor(spaceIndex / 3);
 	var columnNum = Math.floor(spaceIndex % 3);
 	this.board[rowNum][columnNum] = this.currentPlayer();
-}
-
-Game.prototype.renderMove = function(spaceIndex) {
-	$(".turn").eq(spaceIndex).html(this.currentPlayer())
-	$(".turn").eq(spaceIndex).css("background-color", this.currentPlayerColor())
 }
 
 Game.prototype.validMove = function(spaceIndex) {
@@ -76,60 +63,6 @@ Game.prototype.boardWin = function() {
 	return this.diagonalWin() || this.columnWin() || this.rowWin();
 }
 
-Game.prototype.colorWin = function(direction, index) {
-	var coordinates;
-	if (direction === "row") {
-		coordinates = [index * 3, (index * 3) + 1, (index * 3) + 2];
-	} else if (direction === "column") {
-		coordinates = [index, index + 3, index + 6];
-	} else if (direction === "upleft") {
-		coordinates = [0, 4, 8];
-	} else if (direction === "downleft") {
-		coordinates = [2, 4, 6]
-	};
-	coordinates.forEach(function(element) {
-		$(".turn").eq(element).css("background-color", "green");
-	});
-}
-
-Game.prototype.renderRowWin = function() {
-	var that = this
-	that.board.forEach(function(row) {
-		if (checkRow(row)) {
-			that.colorWin("row", that.board.indexOf(row))
-		}
-	});
-}
-
-Game.prototype.renderColumnWin = function() {
-	var that = this
-	var transposedBoard = transposeBoard(that.board);
-	transposedBoard.forEach(function(column) {
-		if (checkRow(column)) {
-			that.colorWin("column", transposedBoard.indexOf(column))
- 		}
-	});
-}
-
-Game.prototype.renderDiagonalWin = function() {
-	if (checkUpLeft(this.board)) {
-		this.colorWin("upleft");
-	} else if (checkDownLeft(this.board)) {
-		this.colorWin("downleft");
-	}
-}
-
-Game.prototype.renderWin = function() {
-	if (this.diagonalWin()) {
-		this.renderDiagonalWin();
-	} else if (this.rowWin()) {
-		this.renderRowWin();
-	} else if (this.columnWin()) {
-		this.renderColumnWin();
-	};
-	$(".replay").toggle();
-};
-
 Game.prototype.remainingMoves = function() {
 	if ($(".turn:empty").length === 0) {
 		return false
@@ -137,12 +70,9 @@ Game.prototype.remainingMoves = function() {
 	return true
 }
 
-Game.prototype.resetBoard = function() {
+Game.prototype.resetGame = function() {
 	this.board = [[null, null, null], [null, null, null], [null, null, null]]
 	this.turnCount = 1
-	$(".turn").empty();
-	$(".turn").css("background-color", "white");
-	$(".replay").toggle();
 }
 
 var transposeBoard = function(array) {

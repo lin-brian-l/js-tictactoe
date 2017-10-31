@@ -8,10 +8,10 @@ $(document).ready(function() {
       var spaceIndex = $("li").index($li);
       if (game.validMove(spaceIndex)) {
         game.placeMove(spaceIndex)
-        game.renderMove(spaceIndex);
+        renderMove(spaceIndex, game.currentPlayer());
         if (game.boardWin()) {
           renderMessage(message, "win", game.currentPlayer())
-          game.renderWin();
+          renderWin(game);
         } else if (game.remainingMoves()) {
           game.turnCount += 1;
           renderMessage(message, "turn", game.currentPlayer());
@@ -26,7 +26,7 @@ $(document).ready(function() {
   });
 
   $(".replay").on("click", function(event) {
-    game.resetBoard();
+    resetBoard(game);
     renderMessage(message, "turn", game.currentPlayer())
   });
 
